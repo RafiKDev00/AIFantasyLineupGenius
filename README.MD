@@ -11,7 +11,7 @@ An ESPN Fantasy Football bot that automatically finds the **optimal weekly lineu
 | `main.py`             | Entry point for running the script |
 | `lineup_genius.py`    | Logic to build the best lineup based on projections |
 | `espn_client.py`      | Handles fetching data from ESPN via the `espn-api` library |
-| `credentials.json`    | Stores `SWID` and `espn_s2` cookies (⚠️ ignored by Git) |
+| `credentials.json`    | Stores `SWID` and `espn_s2` cookies (ignored by Git) |
 | `.env`                | Stores your secret tokens and league info (also ignored) |
 | `requirements.txt`    | Python dependencies (so far just `espn-api`) |
 | `.gitignore`          | Prevents secrets and system files from being tracked |
