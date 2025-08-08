@@ -1,6 +1,6 @@
 # Lineup Genius
 
-An ESPN Fantasy Football bot that automatically finds the **optimal weekly lineup** for your team based on projected points.
+Your friends want you in the fantasy league, but you don't know anything about football? Liable to forget to set your lineup every week? Here's your solution! An ESPN Fantasy Football genius that automatically finds the **optimal weekly lineup** and sets it.
 
 ---
 
