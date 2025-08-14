@@ -1,0 +1,30 @@
+B"SD
+
+Basic Outline:
+
+  1. Get full team √
+  2. Extract all players values - we need an algorithm that can optimze the amount of points
+    - tricky because some players can be in mulitple positions
+    - we want to do all the optimizing "in abstract", don't post untill the end
+  3. Return and post all individual
+  4. set up a server to do this on a timer
+    - Also have it email me if there are any issues with logging in.
+
+  5. Bonus scrape from some advanced fantasy projections and use those/compare them to ESPN to make judgements
+  6. Trade Handling
+
+
+Optimization Logic:
+  1. I feel like a greedy algorithm is right...in
+  2. We can sepperate into buckets...QB's, K's, and D's are always one to one,
+  there is no sepcial logic for them
+  3. WR's, TE's, RB's are trickier. My Gut says harvest the highest projected for their natarual positions
+  and thent take the highest of the remaining players for the flex position
+  4. In short of taking in matchups and the like...that's beyond me at the moment. ESPN's projections should do that already,
+  But frankly I have to outsource to someone who knows football better. My other options are to create some advanced algorithm,
+  or try to use some AI but GPT may be slightly behind on information, even if it can search the internet...IDK that's a later iteration.
+  Or lastly I can try to use some advanced projections that someone else runs! I'm sure there is someone who does projections with a lower
+  margin of error then ESPN, and if they are the kinda nerd who does that, they're the kinda nerd that probably has an API I can hit.
+  chefs kiss
+
+
