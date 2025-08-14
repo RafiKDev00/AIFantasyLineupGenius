@@ -3,3 +3,108 @@ __pycache__/
 .env
 *.pyc
 .DS_Store
+
+
+Short answer: yes—when there’s no public API (or the docs are incomplete), the most reliable path is to mirror what the official web app does. You let the product tell you the real contract: the URL, method, headers, auth, and exact JSON shape it expects. Here’s a clean, repeatable way to do it.
+The playbook (end-to-end)
+1) Observe (what does the app actually do?)
+Open the page where you can perform the action manually.
+Open DevTools → Network (Preserve log on).
+Do the action once (e.g., drag WR → WR slot).
+In the Network list, find the write request (usually POST/PUT).
+Confirm:
+Host & path (read vs write hosts can differ; ESPN uses lm-api-writes…/transactions/ for writes).
+Method (POST/PUT/PATCH).
+Query params (e.g., view=…).
+Request headers (User-Agent, Origin, Referer, any x-* headers).
+Cookies/auth (e.g., SWID, espn_s2).
+Body (the exact JSON shape & field names).
+Tip: do one more manual action (reverse the move) and compare the two bodies; the differences often reveal what’s required vs. incidental.
+2) Capture (save the truth)
+In DevTools, Copy → Copy as cURL for the write request.
+Paste it into a safe scratch file. Redact Cookie values; keep everything else.
+Also copy the raw JSON body (“View source” if available).
+Why: cURL is lossless—later you can replay it to ensure your headers/payload really match.
+3) Reproduce (prove you can call it)
+Start with a minimal “browser-like” replay from code:
+Use a requests.Session() (reuses cookies/headers).
+Set User-Agent, Origin, Referer, and any x-fantasy-* (or other vendor) headers you saw.
+Send cookies (your session tokens) as DevTools showed.
+Warm up with a GET to a related read endpoint (often what the browser does right before the write).
+Send the same method + URL + JSON body.
+Verify immediately after with a GET that shows the new state (don’t rely on the UI; fetch JSON and inspect the changed fields).
+4) Generalize (parameterize only the essentials)
+Keep the wire contract identical (url, headers, body keys).
+Parameterize the values that must change: teamId, memberId, scoringPeriodId, playerIds, lineupSlotIds.
+Compute those values from your local model (e.g., reading the roster to identify candidates), but do not rename or restructure the JSON keys you saw.
+With ESPN we learned the winning body was:
+POST to /transactions/
+{ type: "ROSTER", executionType: "EXECUTE", items: [{ playerId, type: "LINEUP", fromLineupSlotId, toLineupSlotId }, …] }
+Plus teamId, memberId (your SWID with braces), scoringPeriodId.
+5) Harden (make it robust)
+Headers: keep the browser-like set; servers behind WAF/CDN may ignore “botty” requests.
+Auth rotation: detect 401/403/302 → tell yourself “cookies expired” and fail loud.
+Validation: assert players are on your roster; slots are valid for that position; week is open.
+Dry-run flag: print the exact URL + JSON you’d send before actually POSTing.
+Idempotency: if the current lineup already matches your target, skip the call.
+Rate limiting: exponential backoff for 429s; don’t spam writes.
+Logging: on non-2xx, log status, response.text[:N], and the payload you tried.
+6) Maintain (APIs drift—expect change)
+Each preseason, redo Step 1 for one action.
+Keep a tiny smoke test (e.g., swap two bench players then swap back).
+Version guardrails: if JSON schema or host changes, detect and guide yourself (e.g., “write host changed; recapture with DevTools”).
+When not to mirror
+If there’s a documented public API that covers your use case—use it first.
+If ToS forbids automation for that action; mirroring may violate policy. (Always check the site’s terms and be respectful—low frequency, personal use, no scraping abuse.)
+A tiny template you can reuse
+import os, time, random, requests, json
+from urllib.parse import unquote
+
+def browser_session(cookies, referer, user_agent, origin):
+    s = requests.Session()
+    s.headers.update({
+        "User-Agent": user_agent,
+        "Accept": "application/json, text/plain, */*",
+        "Content-Type": "application/json",
+        "Origin": origin,
+        "Referer": referer,
+    })
+    s.cookies.update(cookies)
+    return s
+
+def post_transaction(url_writes, roster_url, payload, extra_headers=None):
+    s2 = unquote(os.getenv("ESPN_S2").strip())
+    swid = os.getenv("SWID").strip()
+    sess = browser_session(
+        cookies={"espn_s2": s2, "SWID": swid},
+        referer="https://fantasy.espn.com/",
+        user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17 Safari/605.1.15",
+        origin="https://fantasy.espn.com"
+    )
+    if extra_headers:
+        sess.headers.update(extra_headers)
+
+    g = sess.get(roster_url, params={"view": "mRoster"}, timeout=15)
+    if not g.ok:
+        raise RuntimeError(f"Warm-up GET failed: {g.status_code}")
+    time.sleep(0.4 + random.random() * 0.6)
+
+    r = sess.post(url_writes, json=payload, timeout=20)
+    return r
+
+# Usage (illustrative):
+# r = post_transaction(
+#     url_writes="https://lm-api-writes.fantasy.espn.com/.../transactions/",
+#     roster_url="https://fantasy.espn.com/apis/v3/games/ffl/seasons/.../leagues/...",
+#     payload=payload_from_devtools,
+#     extra_headers={"X-Fantasy-Platform": "kona-PROD", "X-Fantasy-Source": "kona"}
+# )
+# print(r.status_code, r.text[:400])
+A quick checklist you can pin
+ Do the action manually once with DevTools open
+ Copy exact Request URL, method, headers (minus cookies), body JSON
+ Replay with a session and browser-ish headers
+ Verify by re-GETting the mutated resource
+ Parameterize only values; keep JSON keys & shape
+ Add dry-run, logging, error handling, rate limit backoff
+ Re-capture each season (APIs drift)
