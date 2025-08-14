@@ -25,6 +25,6 @@ Optimization Logic:
   or try to use some AI but GPT may be slightly behind on information, even if it can search the internet...IDK that's a later iteration.
   Or lastly I can try to use some advanced projections that someone else runs! I'm sure there is someone who does projections with a lower
   margin of error then ESPN, and if they are the kinda nerd who does that, they're the kinda nerd that probably has an API I can hit.
-  chefs kiss
+  chefs kiss. Also what if I do this in Java.
 
 
