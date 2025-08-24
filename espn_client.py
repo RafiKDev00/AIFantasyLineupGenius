@@ -16,7 +16,7 @@ def get_league():
     load_dotenv(override=True)
 
     swid = os.getenv("SWID", "").strip()
-    s2 =unquote(os.getenv("ESPN_S2", "").strip())  # decode %2B -> +, etc.
+    s2 =unquote(os.getenv("ESPN_S2", "").strip())  # decode - honestly this was an overkill
     league_id = os.getenv("LEAGUE_ID", "").strip()
     year = int(os.getenv("YEAR", "2025"))
 

@@ -3,7 +3,9 @@ __pycache__/
 .env
 *.pyc
 .DS_Store
-
+lineupGenius.py
+dataCollector.py
+espnPost.py
 
 Short answer: yes—when there’s no public API (or the docs are incomplete), the most reliable path is to mirror what the official web app does. You let the product tell you the real contract: the URL, method, headers, auth, and exact JSON shape it expects. Here’s a clean, repeatable way to do it.
 The playbook (end-to-end)
