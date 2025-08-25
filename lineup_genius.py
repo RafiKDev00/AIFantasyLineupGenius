@@ -26,8 +26,8 @@ def optimize_wr_swaps(player_map):
     calling `swapper` once per winning upgrade.
     Expects `is_bench_slot` and `is_WR_slot` to be defined.
     """
-    starters = []  # [(pid, proj, slot_id, info)]
-    bench = []     # [(pid, proj, slot_id, info)]
+    starters = []  #[(pid, proj, slot_id, info)] 
+    bench = []#[(pid, proj, slot_id, info)]
 
     for pid, info in player_map.items():
         slot_label = info["slot"]

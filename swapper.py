@@ -10,8 +10,10 @@ from espn_api.football import League
 
 
 WEEK = 1
-TEAM_ID = 1 # I know i know
+TEAM_NAME = "RafiSquared" # I know i know
 load_dotenv(override=True) # override so we reload the .env everytime
+TEAM_ID = int(os.getenv("TEAM_ID"))
+LEAGUE_ID = int(os.getenv("TEAM_ID"))
 
 def swapper(to_bench, to_lineup):  
 
@@ -62,7 +64,7 @@ def swapper(to_bench, to_lineup):
 
     #send via writes cluster with browserish headers
     base_writes = "https://lm-api-writes.fantasy.espn.com"
-    url = f"{base_writes}/apis/v3/games/ffl/seasons/{2025}/segments/0/leagues/{2056100353}/transactions/"
+    url = f"{base_writes}/apis/v3/games/ffl/seasons/{2025}/segments/0/leagues/{league_id}/transactions/"
 
     s2 = unquote(os.getenv("ESPN_S2").strip())
     cookies = {

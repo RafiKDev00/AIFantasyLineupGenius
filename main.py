@@ -7,11 +7,13 @@ from dotenv import load_dotenv
 from lineup_genius import lineup_optimizer
 from espn_client import get_league
 
+
 #configuration stuff
-TEAM_ID = 1  # this will change when we've drafted and can use regualr team name
+TEAM_NAME = "RafiSquared"  # this will change when we've drafted and can use regualr team name
 WEEK = 1   # We will have a server that'll track the week "automatically", but for now hardcoded
 
 load_dotenv(override=True) # override so we reload the .env everytime
+TEAM_ID = int(os.getenv("TEAM_ID"))
 
 
 SLOT_NAME_TO_ID = { #backup slot id's
@@ -34,73 +36,72 @@ def slot_info(p):
                 break
     return int(sid) if sid is not None else 20, sname or "BE"
 
-def build_projections_week_map(league, team, week: int):
-    """
-    Returns:
-      {
-        playerId: {
-          "playerId": int,
-          "name": str,
-          "position": str,
-          "slot": str,       # current lineup slot label (e.g., 'WR', 'BE', 'FLEX')
-          "slot_id": int,    # current lineup slot id (fallback to 20 = bench)
-          "proj": float      # weekly projection (0.0 if not available)
-        }, ...
-      }
-    """
-    data = {}
 
-    # 1) start from your team roster so everyone is present
-    for p in getattr(team, "roster", []):
-        pid = int(p.playerId)
-        sid, sname = slot_info(p)  # your helper
+def get_my_boxscore(league, team_id: int, week: int):
+    for bs in league.box_scores(week):
+        if bs.home_team.team_id == team_id:
+            return bs, "home"
+        if bs.away_team.team_id == team_id:
+            return bs, "away"
+    raise RuntimeError(f"Team {team_id} not found in box scores for week {week}")
+
+
+
+def build_projections_week_map(league, team, week: int):
+
+    '''
+    We have to get the player values from boxscore (that's where the week by week
+    projected values are held - kinda a pain not directly assigned to players,
+    but I didn't make the API...), so we loop thorugh the mathcups, it's a total pain,
+    get our boscore in get_my_boscore and then down we go. 
+    We create a data structure that has allt the basic components we need to post
+    to ESPN later on, but also, gives us what we need to make swaps, I.E...projections
+    it's a little unweildy, but we will take get the projection by pid from the map of pid
+    to projections form the boxcore...and we will then place that in the players data{} block in the data strucutre
+    it's a hassle
+    
+    '''
+
+    bs, side = get_my_boxscore(league, team.team_id, week)
+    my_lineup = bs.home_lineup if side == "home" else bs.away_lineup
+
+    #pid => projected points (from your lineup only)
+    proj_by_pid = {
+        int(s.playerId): float(s.projected_points)
+        for s in (my_lineup or [])
+        if getattr(s, "projected_points", None) is not None
+    }
+
+    data = {}
+    for p in team.roster:
+        pid   = int(p.playerId)
+        sid   = getattr(p, "lineupSlotId", None)
+        sname = (getattr(p, "lineupSlot", "") or "").upper()
+
+        #we are gonna raise an error if this is missing via key error, otherwise we'd have huge issues
+        proj = proj_by_pid[pid]  
+
         data[pid] = {
             "playerId": pid,
             "name": getattr(p, "name", "Unknown"),
             "position": getattr(p, "position", "UNK"),
-            "slot": (sname or "BE"),
+            "slot": sname or "BE",
             "slot_id": int(sid) if sid is not None else 20,
-            "proj": 0.0,
+            "proj": proj,
         }
-
-    #2)add projections (and optionally fresher slot info) from box scores
-    def overlay(lineup):
-        for slot in (lineup or []):
-            try:
-                pid = int(getattr(slot, "playerId", -1))
-            except Exception:
-                continue
-            if pid not in data:
-                continue
-
-            #projection
-            proj = getattr(slot, "projected_points", None)
-            if proj is not None:
-                data[pid]["proj"] = float(proj)
-
-            # slot/slot_id - if present in box score, refresh)  
-            sid = getattr(slot, "lineupSlotId", None)
-            sname = (getattr(slot, "lineupSlot", "") or "").upper()
-            if sname:
-                data[pid]["slot"] = sname
-            if sid is not None:
-                data[pid]["slot_id"] = int(sid)
-
-            #def overkill pretttyyyy sure, I think what i thought needed backfilling was a bug on my end (emoji needed here)
-            if data[pid]["name"] == "Unknown":
-                data[pid]["name"] = getattr(slot, "name", data[pid]["name"])
-            if data[pid]["position"] == "UNK":
-                data[pid]["position"] = getattr(slot, "position", data[pid]["position"])
-
-    for bs in league.box_scores(week):
-        overlay(bs.home_lineup)
-        overlay(bs.away_lineup)
-
     return data
+
+
 
 def main():
     swid = os.getenv("SWID", "").strip()  # member ID (with braces!)
     league = get_league()
+    # print(league)
+
+    # for team in league.teams:
+    #     print(f"Team Name {team.team_name} + Team ID: {team.team_id}")
+
+
 
     team = next((t for t in league.teams if t.team_id == TEAM_ID), None)
     if not team:
@@ -110,6 +111,13 @@ def main():
     # proj_map = build_week_proj_map(league, WEEK)
 
     player_map = build_projections_week_map(league, team, WEEK)
+    print("\n--- Full Roster (player_map) ---")
+    print(f"{'Name':<25} {'Pos':<4} {'PlayerID':<8} {'SlotID':<6} {'Slot':<8} {'Proj(Wk)':>10}")
+    for pid, info in sorted(player_map.items(), key=lambda kv: (-kv[1]["proj"], kv[1]["name"])):
+        print(f"{info['name']:<25} {info['position']:<4} {info['playerId']:<8} {info['slot_id']:<6} {info['slot']:<8} {info['proj']:>10.2f}")
+
+       # ok this is fantastic take this info and let's see if we can take a simple script that forces the transfer
+
     player_map = lineup_optimizer(player_map)  
 
     #one of those fantastic chatgpt generated print statements

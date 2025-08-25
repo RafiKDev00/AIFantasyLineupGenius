@@ -32,4 +32,8 @@ def get_league():
         swid=swid,
         espn_s2=s2
     )
+    # print(f"Leauge Name: {league.league_id}\n")
+    # for team in league.teams:
+    #     print(f"Team Name {team.team_name} + Team ID: {team.team_id}")
+    
     return league
