@@ -1,131 +1,117 @@
-#B''SD
-#lineupOptimizer.py
-
+# B''SD
+# lineup_genius.py
+from collections import defaultdict
+from swapper import swapper_but_now_one_by_one
 import os
 from dotenv import load_dotenv
-from urllib.parse import unquote
-from espn_api.football import League
-from swapper import swapper
 
-def is_bench_slot( slot_label: str) -> bool:
-    return slot_label in ("BE", "BN", "BENCH")
+'''
+This method was born out of a realization that trying to optimize by finding the best
+and swapping got some nasty edge cases, easier to find the optimal switches before messing
+with espn, otherwise too easy to get collisions and such. ALSO, this formats it PERFECTLY
+for setting it up to have GPT set the lineup. Just saying.
 
-def is_WR_slot(slot_label: str, slot_id: int) -> bool:
-    return slot_label == "WR" or slot_id == 4
+'''
+# We will have a server that'll track the week "automatically", but for now hardcoded
 
-def is_flex_slot(slot_label, slot_id) -> bool:
-    return slot_label in ("W/R/T", "FLEX", "RB/WR/TE") or slot_id == 23
+WEEK = int(os.getenv("WEEK"))# We will have a server that'll track the week "automatically", but for now hardcoded
 
-def optimize_qb_swaps(slot_label:str, slot_id: int)-> bool:
-    return slot_label in ("QB") or slot_id == 0
+SLOT_ID = {"QB":0, "RB":2, "WR":4, "TE":6, "D/ST":16, "K":17, "FLEX":23, "BE":20} #we've seen this list before
+ROSTER_NEEDS = {"QB":1, "RB":2, "WR":2, "TE":1, "FLEX":1, "K":1, "D/ST":1} # how many positions there are to fill
+FLEX_OK = {"RB","WR","TE"} #who can be in flex
+STARTER_SLOTS = [SLOT_ID["QB"], SLOT_ID["RB"], SLOT_ID["WR"], SLOT_ID["TE"],
+                 SLOT_ID["K"], SLOT_ID["D/ST"], SLOT_ID["FLEX"]]
+# ya starter slot ID's
+#there's a LOT of mapping going on here
 
-
-def optimize_wr_swaps(player_map):
-    """
-    Replace starting WRs with higher-projected bench WRs (up to 2),
-    calling `swapper` once per winning upgrade.
-    Expects `is_bench_slot` and `is_WR_slot` to be defined.
-    """
-    starters = []  #[(pid, proj, slot_id, info)] 
-    bench = []#[(pid, proj, slot_id, info)]
-
+def compute_best_lineup(player_map):
+    '''Use a greedy algorithm to create the optimal roster/fill slots, the best remaining rb/wr/ ===> FLEX'''
+    by_pos = {} #list of PIDS and proj's by position...thanks GPT for a smart way to organize this btw
     for pid, info in player_map.items():
-        slot_label = info["slot"]
-        slot_id = info["slot_id"]
-        proj = info["proj"]
-        pos = info["position"]
+        by_pos.setdefault(info["position"], []).append((pid, info["proj"])) 
+    for lst in by_pos.values():
+        lst.sort(key=lambda x: x[1], reverse=True)
 
-        if is_WR_slot(slot_label, slot_id):
-            starters.append((pid, proj, slot_id, info))
-        elif is_bench_slot(slot_label) and pos == "WR":
-            bench.append((pid, proj, slot_id, info))
+    desired = {}
+    def take_top(pos, n, slot_id):     #here we go...we harvest the top postion for each slot and put itas desired for position
+        for pid, _ in by_pos.get(pos, [])[:n]:
+            desired[pid] = slot_id
 
-    if not starters or not bench:
-        return player_map
+    take_top("QB",   ROSTER_NEEDS["QB"],   SLOT_ID["QB"])   #call this repititvelt
+    take_top("TE",   ROSTER_NEEDS["TE"],   SLOT_ID["TE"])
+    take_top("K",    ROSTER_NEEDS["K"],    SLOT_ID["K"])
+    take_top("D/ST", ROSTER_NEEDS["D/ST"], SLOT_ID["D/ST"])
+    take_top("RB",   ROSTER_NEEDS["RB"],   SLOT_ID["RB"])
+    take_top("WR",   ROSTER_NEEDS["WR"],   SLOT_ID["WR"])
 
-    # We want to replace the weakest starters with the strongest bench WRs
-    starters.sort(key=lambda t: t[1])              # ascending by proj (weakest first)
-    bench.sort(key=lambda t: t[1], reverse=True)   # descending by proj (strongest first)
+    flex_pool = [] #like deadpool but nothing like deadpool...remaining players in desired are elligible for flex and now we will proceed to put them ehre and find the best
+    for pos in FLEX_OK:      #the flex is the reaming highest player...so we sort through who's left that's not in desired AND we check they're eligible to flex ofc
+        for pid, proj in by_pos.get(pos, []):
+            if pid not in desired:
+                flex_pool.append((pid, proj))
+    flex_pool.sort(key=lambda x: x[1], reverse=True)
+    for i in range(ROSTER_NEEDS["FLEX"]):
+        if i <len(flex_pool):
+            desired[flex_pool[i][0]] = SLOT_ID["FLEX"]
 
-    # Try up to two upgrades (zip handles fewer/more safely)
-    for (s_pid, s_proj, s_slot_id, s_info), (b_pid, b_proj, b_slot_id, b_info) in zip(starters, bench):
-        if b_proj > s_proj:
-            # Keep your tuple shape: (pid, proj, slot_id, proj, info)
-            to_bench  = (s_pid, s_proj, 4, s_proj, s_info)  # starter → to bench
-            to_lineup = (b_pid, b_proj, 20, b_proj, b_info)  # bench → to lineup
-            swapper(to_bench, to_lineup)
-        else:
-            # Best remaining bench WR can't beat this (or any stronger) starter
-            break
+    for pid in player_map:    #everyone else...takes a seat on the bench
+        if pid not in desired:
+            desired[pid] = SLOT_ID["BE"]
+    return desired
 
+def plan_moves_sequential(player_map, desired):
+    ''' 
+    Build single player LINEUP moves in a lineup like order
+    Step one -> vacate the starters who shouldn't be there to the bench
+    and the Two --> raise desired players into target slots
+    '''
 
-def lineup_optimizer(player_map):
+    cur_by_slot = defaultdict(set) #yeahhhhh  slot_id -> set(pid) currently there
+    cur_slot_of = {}   # pid => current slot_id
+    for pid, info in player_map.items():
+        s = int(info["slot_id"]) #s is a holder value a.k.a the slot though
+        cur_by_slot[s].add(pid)
+        cur_slot_of[pid] = s
 
-  """ 
-  Ok basic strategy here, we have a dict of dicts, first level is 
-  Key (player ID): a dict of player Values (player info), inside that dict 
-  we have the position value. I would like to do this in O(n), and the good news
-  is that the logic is simple. Basic greedy algorithm as we outlined in the 
-  strategy file. We should need to do as many iterations through the lineup
-  as there are positions (QB, TE, WR, RB, D/ST, K, + for flex). 
-  We will then need to iterate through the sublists to find the best possible swaps,
-  that kinda list and then iterating over smaller sublists could make this look like
-  O(nlogn), but functionally these sublists are tiny, and anyway, I'm not unhappy with 
-  an O(nlogn) complexity. 
+    want_by_slot = defaultdict(set)     #slot_id ==> set(pid) that should be there
+    for pid, want in desired.items():
+        want_by_slot[int(want)].add(pid)
 
-  First step iterate and collect every player by position and then sort into sepperate dicts.
-  I wanta  dict of all WR's to start. let's just do that as a test case, 
+    moves = []     #this is an ordered list of moves to execute ... no more collisions at the end points
+    # vacate!
+    for slot in STARTER_SLOTS: #strep up iteratet through...also it's nice what we're doing is essentially building the POST commanf
+        #you'll see these same fields being used in the swapper down the road
+        for pid in list(cur_by_slot[slot] - want_by_slot[slot]):
+            moves.append({
+                "playerId": pid,
+                "fromLineupSlotId": cur_slot_of[pid],
+                "toLineupSlotId": SLOT_ID["BE"],
+            })
+            cur_by_slot[cur_slot_of[pid]].remove(pid)
+            cur_by_slot[SLOT_ID["BE"]].add(pid)
+            cur_slot_of[pid] = SLOT_ID["BE"]
+    # move to lineup! Same exact idea as above...just going the other way
+    for slot in STARTER_SLOTS:
+        for pid in list(want_by_slot[slot] - cur_by_slot[slot]):
+            moves.append({
+                "playerId": pid,
+                "fromLineupSlotId": cur_slot_of[pid],  # could be 20 or 23, etc.
+                "toLineupSlotId": slot,
+            })
+            cur_by_slot[cur_slot_of[pid]].discard(pid)
+            cur_by_slot[slot].add(pid)
+            cur_slot_of[pid] = slot
 
-  then we'll take the best ones and only the essential details and send to be processed
+    moves = [m for m in moves if m["fromLineupSlotId"] != m["toLineupSlotId"]] # A last check to make sure no collisons...probably redundant but better safe then sorry
+    return moves
 
-  """
+def lineup_optimizer(player_map, WEEK ):
+    desired = compute_best_lineup(player_map) #this calls the above...
+    cur_total = sum(info["proj"] for info in player_map.values() if info["slot_id"] != SLOT_ID["BE"]) # calculates what our lineup currently would be from the old "player map"
+    new_total = sum(player_map[pid]["proj"] for pid, slot in desired.items() if slot != SLOT_ID["BE"]) #
+    print(f"Projected starters total: current={cur_total:.2f} -> desired={new_total:.2f}") # How much better can we do? thank you GPT again for fantastic print statemetns
 
-
-  #i'm just trying to swap the Flex with highest value person on the bench
-  #start at none and sort through logic wille xist for both
- 
-  #testing because we had issues with the flex
-
-
-  #DO the WR's first
-
-# one at  a time brother
-#   optimize_qb_swaps(player_map)
-
-#   optimize_rb_swaps(player_map)
-
-  optimize_wr_swaps(player_map)
-
-
- 
-  to_bench = None
-  to_lineup = None
-  for pid, info in player_map.items():
-      if is_flex_slot(info["slot"], info["slot_id"]) or info["slot_id"] == 23:# "ok consistent error of not being able to access the flex, it seems we don't know how to properly naem it"
-          to_bench = (pid, info["proj"], 23, info['proj'], info)
-          break  #In my leauge at least there's only one flex, should put this in notes in my readme
-
-  # here we ID all bench players save the guy that's both either a WR RB OR TE and has highest value'
-  for pid, info in player_map.items():
-      if is_bench_slot(info["slot"]) and info["position"] in {"RB", "WR", "TE"}:
-          if to_lineup is None or info["proj"] > to_lineup[1]: # floating point comparison?
-              to_lineup = (pid, info["proj"], 20, info['proj'], info)
-
-
-  if to_bench[1] <= to_lineup[1]: #only send to the swapper if it's worth it!
-      swapper(to_bench, to_lineup)
-
-  return player_map
-
-    
-
-#  data[pid] = {
-#             "playerId": pid,
-#             "name": getattr(p, "name", "Unknown"),
-#             "position": getattr(p, "position", "UNK"),
-#             "slot": (sname or "BE"),
-#             "slot_id": int(sid) if sid is not None else 20,
-#             "proj": 0.0,
-#         }
-
-#this is what info has ^^
+    moves = plan_moves_sequential(player_map, desired) #ok great now make it better
+    print(f"Planned moves: {len(moves)}")
+    swapper_but_now_one_by_one(moves, WEEK) #apply moves...which means send to the swapper
+    return desired
