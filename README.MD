@@ -11,6 +11,7 @@ Your friends want you in the fantasy league, but you don't know anything about f
 | `main.py`             | Entry point for running the script |
 | `lineup_genius.py`    | Logic to build the best lineup based on projections |
 | `espn_client.py`      | Handles fetching data from ESPN via the `espn-api` library |
+| `swapper.py`          | Sends posts to ESPN endpoints, physically "does the swap" |
 | `credentials.json`    | Stores `SWID`,`espn_s2`, and some leauge info cookies (ignored by Git) |
 | `build_player_data_structure.py`| Returns a data structure that can be used to sort your team for swapping purposes |
 | `.env`                | Stores your secret tokens and league info (also ignored) |
