@@ -1,6 +1,6 @@
 # Lineup Genius
 
-Your friends want you in the fantasy league, but you don't know anything about football? Liable to forget to set your lineup every week? Here's your solution! An ESPN Fantasy Football genius that automatically finds the **optimal weekly lineup** and sets it. Right now this is a great way to autoset your lineup by running the code locally. Once you put in your cookies for ESPN login, plus email and email password into .env, you could run this once a week, and it'll set your lineup (or email you if there was an issue getting into your espn and you need to reset your cookies). It'll only really be functoinal once it's connected server, which will hopefully be up and running today. Tight now it needs to be run localy. *Disclaimer* This code only works if your team has the same makeup of positions as mine - but looking to fix that. *Coming soon* We're working on functionality for it to add/drop players, and maybe also link it up with ChatGPT's API so it AI can manage your lineup, maybe even make trades. Nonetheless, right now, this code can optimize your ESPN Fantasy Football lineup with a greedy algorithm, just like you would, but remotely! This has already taken me way more time then it would have to just set my lineup every week, but for you, this will be faster. As I mentioned there is what to build upon, and I'm working on it, the 2025 season has yet to begin...
+Your friends want you in the fantasy league, but you don't know anything about football? Liable to forget to set your lineup every week? Here's your solution! An ESPN Fantasy Football genius that automatically finds the **optimal weekly lineup** and sets it. It's fairly involved to set this up (we're working on it), so check the ***Find Your ESPN Credentials + Set Up*** section below for instructions on what you need to do. *Disclaimer* This code only works if your team has the same makeup of positions as mine - but looking to fix that. *Coming soon* We're working on functionality for it to add/drop players, and maybe also link it up with ChatGPT's API so it AI can manage your lineup, and  maybe even make trades. Nonetheless, as of now now, this code can optimize your ESPN Fantasy Football lineup with a greedy algorithm, just like you would, but remotely and automamously! This has already taken me way more time then it would have to just set my lineup every week, but for you, this will be faster. As I mentioned there is what to build upon, and I'm working on it, the 2025 season has yet to begin...
 
 ---
 
@@ -34,12 +34,35 @@ Your friends want you in the fantasy league, but you don't know anything about f
  - https://fantasy.espn.com/football/team?leagueId=1234567890
  - ^ the 1234567890 in this guy above
 
-5. Go to the credentials file and create a .env with all those fields
+5. Go to the credentials or .env/example file and create a .env with all those fields
 
-6. You are going to need an App Password for the email notifier, so you have to your google acount, Turn on 2 Factor authentification, and make an app password titled "Mail" (no quotes), you put in in your .env with NO spaces",  I hate this for a variety of reasons, it adds a layer of weakness to your personal information and makes another annoying step
+6. You are going to need an App Password - it's one of the .env fields - for the email notifier, so you have to your google acount, Turn on 2 Factor authentification, and make an app password titled "Mail" (no quotes), you put in in your .env with NO spaces",  I hate this for a variety of reasons, it adds a layer of weakness to your personal information and makes another annoying step
 to setting this up, we will improve this. I personally created a dummy email to send this from...it's not attached to anything so if somehow someone gets into it, all they can do is use that email, and they get nothing of value about me,not even real name or birthday. We will find a better way going forward to do this.
 
 5. Right now you need to "source venv/bin/activate" in command line to get your venv or this wont run, remember!
+
+6. in order to run this remotely (on githubs server) you need to upload your secret variables from your personal .env (or you can run this randomly by yourself - but whats the point, that's not managing your team is it) here's what you do (for mac) - If you have any doubt how I did that, ask ChatGPT I learned from it...As for what this does, practically we set it so it'll run itself on githubs server with my personal info it'll access my personal code and use my personal hidden variables. I could otherwise run this locally, but then it isn't automated, which defeats most of the purpose.
+     a. gh auth login  # follow prompts, choose your repo, give "repo" scope
+     b.# Load your local .env into the current shell
+         set -a; source .env; set +a
+
+         # Choose exactly which keys to upload
+         keys=(YEAR LEAGUE_ID TEAM_ID SWID ESPN_S2 SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS ALERT_TO LEAGUE_NAME)
+
+         # Create/update each secret from the env var of the same name
+         for k in "${keys[@]}"; do
+           v="${!k}"
+           if [ -n "$v" ]; then
+             echo "Setting secret $k"
+             gh secret set "$k" -b"$v"
+           else
+             echo "Skipping $k (empty)"
+           fi
+         done
+
+         # Verify
+         gh secret list
+    
 
 
 ## Still to Make

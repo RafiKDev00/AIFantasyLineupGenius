@@ -15,6 +15,15 @@ from swapper import swapper_but_now_one_by_one
 
 
 load_dotenv(override=True) # override so we reload the .env everytime
+
+# Supposefly this hides my variables? Someone could just delete this...whatever GPT enjoy, I dont get you
+required = ["YEAR","LEAGUE_ID","TEAM_ID","SWID","ESPN_S2"]
+missing = [k for k in required if not os.getenv(k)]
+if missing:
+    print("Missing env:", ", ".join(missing))
+    print("Create a .env from .env.example or set GitHub Secrets.")
+    raise SystemExit(1)
+
 TEAM_NAME = os.getenv("TEAM_NAME")  #I'm not really using this value - but I would like to replace team ID with it, more user friendly
 TEAM_ID = int(os.getenv("TEAM_ID"))
 
