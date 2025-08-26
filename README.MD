@@ -43,28 +43,29 @@ to setting this up, we will improve this. I personally created a dummy email to 
 
 6. in order to run this remotely (on githubs server) you need to upload your secret variables from your personal .env (or you can run this randomly by yourself - but whats the point, that's not managing your team is it) here's what you do (for mac) - If you have any doubt how I did that, ask ChatGPT I learned from it...As for what this does, practically we set it so it'll run itself on githubs server with my personal info it'll access my personal code and use my personal hidden variables. I could otherwise run this locally, but then it isn't automated, which defeats most of the purpose.
 
-     a. 
-         # follow prompts, choose your repo, give "repo" scope
-         gh auth login  
-         # Load your local .env into the current shell
-         set -a; source .env; set +a
+   # follow prompts, choose your repo, give "repo" scope
+   gh auth login
 
-         # Choose exactly which keys to upload
-         keys=(YEAR LEAGUE_ID TEAM_ID SWID ESPN_S2 SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS ALERT_TO LEAGUE_NAME)
+   # Load your local .env into the current shell
+   set -a; source .env; set +a
 
-         # Create/update each secret from the env var of the same name
-         for k in "${keys[@]}"; do
-           v="${!k}"
-           if [ -n "$v" ]; then
-             echo "Setting secret $k"
-             gh secret set "$k" -b"$v"
-           else
-             echo "Skipping $k (empty)"
-           fi
-         done
+   # Choose exactly which keys to upload
+   keys=(YEAR LEAGUE_ID TEAM_ID SWID ESPN_S2 SMTP_HOST SMTP_PORT SMTP_USER SMTP_PASS ALERT_TO LEAGUE_NAME)
 
-         # Verify
-         gh secret list
+   # Create/update each secret from the env var of the same name
+   for k in "${keys[@]}"; do
+     v="${!k}"
+     if [ -n "$v" ]; then
+       echo "Setting secret $k"
+       gh secret set "$k" -b"$v"
+     else
+       echo "Skipping $k (empty)"
+     fi
+   done
+
+   # Verify
+   gh secret list
+
     
 
 
