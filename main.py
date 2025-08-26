@@ -10,6 +10,7 @@ from build_player_data_structure import build_player_map_with_projections
 from swapper import swapper_but_now_one_by_one
 
 
+
 #configuration stuff
 
 
@@ -17,10 +18,17 @@ load_dotenv(override=True) # override so we reload the .env everytime
 TEAM_NAME = os.getenv("TEAM_NAME")  #I'm not really using this value - but I would like to replace team ID with it, more user friendly
 TEAM_ID = int(os.getenv("TEAM_ID"))
 
+'''
+Now i'm sure it would be nice to handle the message sending of a failed login (from get_league() below) in main
+but frankly it adds a good amount of complication - if it fails it handles it like a terminal error message
+which we would get anyway, I'm ok with that.
+'''
 league = get_league() #get the league from espn client  - this used to be a variabel local inside the main method - but I pulled it out for clarity purposes
 league.refresh() #refresh was recomended by to make sure we're up to date - I think overkill, but it's one line and better to be safe then sorrt
 WEEK = league.current_week # Before we were hardcoding/baking the Week variable into our env, now it should live update everytime we get the code!
 print(f"did we really get the correct {WEEK}")
+
+
 
 def main():
     '''
@@ -32,7 +40,6 @@ def main():
         is a message (error or success) and a perfectly arragned lineup
     
     '''
-
     swid = os.getenv("SWID", "").strip()  # member ID (with braces!)
 
     team = next((t for t in league.teams if t.team_id == TEAM_ID), None) # find my team in the leauge based of team_ID could also do this with Team Name which may be easier for most people

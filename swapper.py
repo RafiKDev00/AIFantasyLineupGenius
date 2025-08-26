@@ -6,6 +6,7 @@ import random
 from dotenv import load_dotenv
 from urllib.parse import unquote
 from espn_api.football import League
+from send_email import notify_via_email
 
 
 
@@ -51,4 +52,5 @@ def swapper_but_now_one_by_one(moves, week):
                 print(response.json())
             except Exception:
                 print(response.text[:200])
+                
 

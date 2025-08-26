@@ -1,6 +1,6 @@
 # Lineup Genius
 
-Your friends want you in the fantasy league, but you don't know anything about football? Liable to forget to set your lineup every week? Here's your solution! An ESPN Fantasy Football genius that automatically finds the **optimal weekly lineup** and sets it. Right now this is a great way to autoset your lineup by running the code locally. It'll only really be functoinal once it's connected server, which will hopefully be up and runnign today. right now it needs to be run localy. *Disclaimer* This code only works if your team has the same makeup of positions as mine - but looking to fix that. *Coming soon* We're working on functionality for it to add/drop players, and maybe also link it up with ChatGPT's API so it AI can manage your lineup, maybe even make trades, also email notifications that you have stuff to check. Nonetheless, right now, this code can optimize your ESPN Fantasy Football lineup with a greedy algorithm, just like you would, but remotely! This has already taken me way more time then it would have to just set my lineup every week, but for you, this will be faster. As I mentioned there is what to build upon, and I'm working on it, the 2025 season has yet to begin...
+Your friends want you in the fantasy league, but you don't know anything about football? Liable to forget to set your lineup every week? Here's your solution! An ESPN Fantasy Football genius that automatically finds the **optimal weekly lineup** and sets it. Right now this is a great way to autoset your lineup by running the code locally. Once you put in your cookies for ESPN login, plus email and email password into .env, you could run this once a week, and it'll set your lineup (or email you if there was an issue getting into your espn and you need to reset your cookies). It'll only really be functoinal once it's connected server, which will hopefully be up and running today. Tight now it needs to be run localy. *Disclaimer* This code only works if your team has the same makeup of positions as mine - but looking to fix that. *Coming soon* We're working on functionality for it to add/drop players, and maybe also link it up with ChatGPT's API so it AI can manage your lineup, maybe even make trades. Nonetheless, right now, this code can optimize your ESPN Fantasy Football lineup with a greedy algorithm, just like you would, but remotely! This has already taken me way more time then it would have to just set my lineup every week, but for you, this will be faster. As I mentioned there is what to build upon, and I'm working on it, the 2025 season has yet to begin...
 
 ---
 
@@ -22,7 +22,7 @@ Your friends want you in the fantasy league, but you don't know anything about f
 
 ---
 
-## How to Find Your ESPN Credentials
+## How to Find Your ESPN Credentials + Set Up
 
 1. **Login to [fantasy.espn.com](https://fantasy.espn.com)**
 2. Open **DevTools → Application tab → Cookies**
@@ -34,13 +34,18 @@ Your friends want you in the fantasy league, but you don't know anything about f
  - https://fantasy.espn.com/football/team?leagueId=1234567890
  - ^ the 1234567890 in this guy above
 
+5. Go to the credentials file and create a .env with all those fields
+
+6. You are going to need an App Password for the email notifier, so you have to your google acount, Turn on 2 Factor authentification, and make an app password titled "Mail" (no quotes), you put in in your .env with NO spaces",  I hate this for a variety of reasons, it adds a layer of weakness to your personal information and makes another annoying step
+to setting this up, we will improve this. I personally created a dummy email to send this from...it's not attached to anything so if somehow someone gets into it, all they can do is use that email, and they get nothing of value about me,not even real name or birthday. We will find a better way going forward to do this.
+
 5. Right now you need to "source venv/bin/activate" in command line to get your venv or this wont run, remember!
 
 
-## Still to Update
+## Still to Make
 - automatic lineup setting (using server)
 - what if your league has different positions then mine
-- Notifying if bye weeks/SID needs to be replaced/picking up players
+- Notify if replaced/picking up players
 - Connect with ChatGPT
 - manage pick ups and drops and even trades?
 - Front end for easier use
