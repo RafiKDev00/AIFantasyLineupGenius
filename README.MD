@@ -46,7 +46,6 @@ to setting this up, we will improve this. I personally created a dummy email to 
      a. 
          # follow prompts, choose your repo, give "repo" scope
          gh auth login  
-     b.
          # Load your local .env into the current shell
          set -a; source .env; set +a
 
