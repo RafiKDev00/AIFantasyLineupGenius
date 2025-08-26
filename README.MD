@@ -1,6 +1,6 @@
 # Lineup Genius
 
-Your friends want you in the fantasy league, but you don't know anything about football? Liable to forget to set your lineup every week? Here's your solution! An ESPN Fantasy Football genius that automatically finds the **optimal weekly lineup** and sets it. Right now this is a cool proof of concept project, but it won't solve your issues. It won't add players if you're missing positions in a bye week, if you leave a lineup slot empty - it won't do anything about it (it only switches players, this will be the next update), and the code isn't connected to a server, it needs to be physcially run. It also only works if your team has the same makeup of positions as mine. So overall it's limited. However, what it does accomplish, is optimize your ESPN Fantasy Football lineup with a greedy algorithm just like you would, but remotely! This has already taken me way more time then it would have to just set my lineup every week, but for you, this will be faster. As I mentioned there is what to build upon, and I'm working on it, the 2025 season has yet to begin...
+Your friends want you in the fantasy league, but you don't know anything about football? Liable to forget to set your lineup every week? Here's your solution! An ESPN Fantasy Football genius that automatically finds the **optimal weekly lineup** and sets it. Right now this is a great way to autoset your lineup by running the code locally. It'll only really be functoinal once it's connected server, which will hopefully be up and runnign today. right now it needs to be run localy. *Disclaimer* This code only works if your team has the same makeup of positions as mine - but looking to fix that. *Coming soon* We're working on functionality for it to add/drop players, and maybe also link it up with ChatGPT's API so it AI can manage your lineup, maybe even make trades, also email notifications that you have stuff to check. Nonetheless, right now, this code can optimize your ESPN Fantasy Football lineup with a greedy algorithm, just like you would, but remotely! This has already taken me way more time then it would have to just set my lineup every week, but for you, this will be faster. As I mentioned there is what to build upon, and I'm working on it, the 2025 season has yet to begin...
 
 ---
 
@@ -11,10 +11,12 @@ Your friends want you in the fantasy league, but you don't know anything about f
 | `main.py`             | Entry point for running the script |
 | `lineup_genius.py`    | Logic to build the best lineup based on projections |
 | `espn_client.py`      | Handles fetching data from ESPN via the `espn-api` library |
-| `credentials.json`    | Stores `SWID` and `espn_s2` cookies (ignored by Git) |
+| `credentials.json`    | Stores `SWID`,`espn_s2`, and some leauge info cookies (ignored by Git) |
+| `build_player_data_structure.py`| Returns a data structure that can be used to sort your team for swapping purposes |
 | `.env`                | Stores your secret tokens and league info (also ignored) |
 | `requirements.txt`    | Python dependencies (so far just `espn-api`) |
 | `.gitignore`          | Prevents secrets and system files from being tracked |
+| `strategyForFullLineupOptimizer.txt`| A little more in depth then the readme about the codes algorithm
 | `README.md`           | Meta. You're reading it :) |
 
 ---
@@ -33,10 +35,13 @@ Your friends want you in the fantasy league, but you don't know anything about f
 
 
 ## Still to Update
-- automatic lineup setting
+- automatic lineup setting (using server)
 - what if your league has different positions then mine
-- Blank spots in lineup?
 - Notifying if bye weeks/SID needs to be replaced/picking up players
+- Connect with ChatGPT
+- manage pick ups and drops and even trades?
+- Front end for easier use
+- Verify you need to be logged in on a device to use this...I don't think this can break through Disneys password authentication...and maybe it shouldn't
 
 ## Disclaimers
 
