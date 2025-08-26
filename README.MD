@@ -14,11 +14,13 @@ Your friends want you in the fantasy league, but you don't know anything about f
 | `swapper.py`          | Sends posts to ESPN endpoints, physically "does the swap" |
 | `credentials.json`    | Stores `SWID`,`espn_s2`, and some leauge info cookies (ignored by Git) |
 | `build_player_data_structure.py`| Returns a data structure that can be used to sort your team for swapping purposes |
+| `.github/workflows/lineup.yml` | connects me to githubs server so it can run it once a day |
 | `.env`                | Stores your secret tokens and league info (also ignored) |
 | `requirements.txt`    | Python dependencies (so far just `espn-api`) |
 | `.gitignore`          | Prevents secrets and system files from being tracked |
 | `strategyForFullLineupOptimizer.txt`| A little more in depth then the readme about the codes algorithm
 | `README.md`           | Meta. You're reading it :) |
+| `Dockerfile`          | Why do I have a dockerfile, mostly to prove I can, but also could be useful for hosting on a real server (not just github) one day |
 
 ---
 
@@ -66,10 +68,10 @@ to setting this up, we will improve this. I personally created a dummy email to 
          # Verify
          gh secret list
     
+7. docker run --rm lineup-genius:latest If choose to use Docker Image
 
 
 ## Still to Make
-- automatic lineup setting (using server)
 - what if your league has different positions then mine
 - Notify if replaced/picking up players
 - Connect with ChatGPT
