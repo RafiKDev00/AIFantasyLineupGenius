@@ -42,8 +42,11 @@ to setting this up, we will improve this. I personally created a dummy email to 
 5. Right now you need to "source venv/bin/activate" in command line to get your venv or this wont run, remember!
 
 6. in order to run this remotely (on githubs server) you need to upload your secret variables from your personal .env (or you can run this randomly by yourself - but whats the point, that's not managing your team is it) here's what you do (for mac) - If you have any doubt how I did that, ask ChatGPT I learned from it...As for what this does, practically we set it so it'll run itself on githubs server with my personal info it'll access my personal code and use my personal hidden variables. I could otherwise run this locally, but then it isn't automated, which defeats most of the purpose.
-     a. gh auth login  # follow prompts, choose your repo, give "repo" scope
-     b.# Load your local .env into the current shell
+     a. 
+         # follow prompts, choose your repo, give "repo" scope
+         gh auth login  
+     b.
+         # Load your local .env into the current shell
          set -a; source .env; set +a
 
          # Choose exactly which keys to upload
