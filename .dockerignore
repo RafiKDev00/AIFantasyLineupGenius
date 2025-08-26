@@ -1,0 +1,11 @@
+# I don't want anyone getting the venv!!
+.env
+venv/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.git
+.github
+.idea/
+.vscode/
