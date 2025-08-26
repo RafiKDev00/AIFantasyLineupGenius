@@ -10,9 +10,6 @@ TEAM_NAME = "RafiSquared"  # this will change when we've drafted and can use reg
 
 load_dotenv(override=True) # override so we reload the .env everytime
 TEAM_ID = int(os.getenv("TEAM_ID"))
-WEEK = int(os.getenv("WEEK"))# We will have a server that'll track the week "automatically", but for now hardcoded
-
-
 
 SLOT_NAME_TO_ID = { #backup slot id's
     "QB": 0, "RB": 2, "WR": 4, "TE": 6, "D/ST": 16, "K": 17,

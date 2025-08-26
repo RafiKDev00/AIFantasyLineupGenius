@@ -34,6 +34,8 @@ Your friends want you in the fantasy league, but you don't know anything about f
  - https://fantasy.espn.com/football/team?leagueId=1234567890
  - ^ the 1234567890 in this guy above
 
+5. Right now you need to "source venv/bin/activate" in command line to get your venv or this wont run, remember!
+
 
 ## Still to Update
 - automatic lineup setting (using server)
@@ -43,6 +45,7 @@ Your friends want you in the fantasy league, but you don't know anything about f
 - manage pick ups and drops and even trades?
 - Front end for easier use
 - Verify you need to be logged in on a device to use this...I don't think this can break through Disneys password authentication...and maybe it shouldn't
+- NOTE TO SELF: make sure week is correct when week 2 happens...
 
 ## Disclaimers
 

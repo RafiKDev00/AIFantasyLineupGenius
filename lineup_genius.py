@@ -14,7 +14,6 @@ for setting it up to have GPT set the lineup. Just saying.
 '''
 # We will have a server that'll track the week "automatically", but for now hardcoded
 
-WEEK = int(os.getenv("WEEK"))# We will have a server that'll track the week "automatically", but for now hardcoded
 
 SLOT_ID = {"QB":0, "RB":2, "WR":4, "TE":6, "D/ST":16, "K":17, "FLEX":23, "BE":20} #we've seen this list before
 ROSTER_NEEDS = {"QB":1, "RB":2, "WR":2, "TE":1, "FLEX":1, "K":1, "D/ST":1} # how many positions there are to fill
@@ -105,7 +104,7 @@ def plan_moves_sequential(player_map, desired):
     moves = [m for m in moves if m["fromLineupSlotId"] != m["toLineupSlotId"]] # A last check to make sure no collisons...probably redundant but better safe then sorry
     return moves
 
-def lineup_optimizer(player_map, WEEK ):
+def lineup_optimizer(player_map, WEEK):
     desired = compute_best_lineup(player_map) #this calls the above...
     cur_total = sum(info["proj"] for info in player_map.values() if info["slot_id"] != SLOT_ID["BE"]) # calculates what our lineup currently would be from the old "player map"
     new_total = sum(player_map[pid]["proj"] for pid, slot in desired.items() if slot != SLOT_ID["BE"]) #
@@ -113,5 +112,4 @@ def lineup_optimizer(player_map, WEEK ):
 
     moves = plan_moves_sequential(player_map, desired) #ok great now make it better
     print(f"Planned moves: {len(moves)}")
-    swapper_but_now_one_by_one(moves, WEEK) #apply moves...which means send to the swapper
-    return desired
+    return moves

@@ -9,7 +9,6 @@ from espn_api.football import League
 
 
 
-WEEK = 1
 TEAM_NAME = "RafiSquared" # I know i know
 load_dotenv(override=True) # override so we reload the .env everytime
 TEAM_ID = int(os.getenv("TEAM_ID"))
