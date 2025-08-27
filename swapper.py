@@ -11,7 +11,8 @@ from send_email import notify_via_email
 
 
 TEAM_NAME = "RafiSquared" # I know i know
-load_dotenv(override=True) # override so we reload the .env everytime
+# load_dotenv(override=True) # override so we reload the .env everytime
+load_dotenv(override=not os.getenv("GITHUB_ACTIONS"))
 TEAM_ID = int(os.getenv("TEAM_ID"))
 LEAGUE_ID = int(os.getenv("LEAGUE_ID"))
 SWID = (os.getenv("SWID"))

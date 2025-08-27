@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 TEAM_NAME = "RafiSquared"  # this will change when we've drafted and can use regualr team name
 
 
-load_dotenv(override=True) # override so we reload the .env everytime
+# load_dotenv(override=True) # override so we reload the .env everytime
+load_dotenv(override=not os.getenv("GITHUB_ACTIONS"))
 TEAM_ID = int(os.getenv("TEAM_ID"))
 
 SLOT_NAME_TO_ID = { #backup slot id's

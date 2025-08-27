@@ -14,8 +14,8 @@ from swapper import swapper_but_now_one_by_one
 #configuration stuff
 
 
-load_dotenv(override=True) # override so we reload the .env everytime
-
+# load_dotenv(override=True) # override so we reload the .env everytime
+load_dotenv(override=not os.getenv("GITHUB_ACTIONS"))
 # Supposefly this hides my variables? Someone could just delete this...whatever GPT enjoy, I dont get you
 required = ["YEAR","LEAGUE_ID","TEAM_ID","SWID","ESPN_S2"]
 missing = [k for k in required if not os.getenv(k)]
