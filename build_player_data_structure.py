@@ -9,7 +9,8 @@ TEAM_NAME = "RafiSquared"  # this will change when we've drafted and can use reg
 
 
 # load_dotenv(override=True) # override so we reload the .env everytime
-load_dotenv(override=not os.getenv("GITHUB_ACTIONS"))
+if not os.getenv("GITHUB_ACTIONS"):  # local dev only
+    load_dotenv(override=True)
 TEAM_ID = int(os.getenv("TEAM_ID"))
 
 SLOT_NAME_TO_ID = { #backup slot id's

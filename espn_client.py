@@ -15,7 +15,8 @@ def get_league():
 
     # envs can be annoying and hold previous values, so we just override
     # load_dotenv(override=True)
-    load_dotenv(override=not os.getenv("GITHUB_ACTIONS"))
+    if not os.getenv("GITHUB_ACTIONS"):  # local dev only
+        load_dotenv(override=True)
 
     swid = os.getenv("SWID", "").strip()
     s2 =unquote(os.getenv("ESPN_S2", "").strip())  # decode - honestly this was an overkill
