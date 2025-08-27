@@ -9,6 +9,8 @@ on:
     - cron: '0 */6 * * *'
     - cron: '52 8 * * *'   # 11:52 in summer (UTC+3)
     - cron: '52 9 * * *'   # 11:52 in winter (UTC+2)
+    - cron: '20 9 * * *'   # 12:20 Asia/Jerusalem during DST (UTC+3)
+    - cron: '20 10 * * *'  # 12:20 Asia/Jerusalem during standard time (UTC+2)
   workflow_dispatch: {}   # lets you run it manually from the Actions tab
 
 jobs:
