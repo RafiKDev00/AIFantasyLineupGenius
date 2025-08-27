@@ -5,7 +5,7 @@ name: Optimize Lineup Daily
 on:
   schedule:
     # GitHub cron is UTC. 06:00 UTC ≈ 09:00 Asia/Jerusalem in summer. 
-    - cron: "0 6 * * *"
+    - cron: "0 8 * * *"
   workflow_dispatch: {}   # lets you run it manually from the Actions tab
 
 jobs:
