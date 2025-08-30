@@ -68,8 +68,9 @@ def main():
     for pid, info in sorted(player_map.items(), key=lambda kv: (-kv[1]["proj"], kv[1]["name"])):
         print(f"{info['name']:<25} {info['position']:<4} {info['playerId']:<8} {info['slot_id']:<6} {info['slot']:<8} {info['proj']:>10.2f}")
 
-    # desired_moves = lineup_optimizer(player_map, WEEK)  # takes the players and projectionsgets the list of commands to send to swapper
-    desired_moves = chat_decides(player_map, week=WEEK, model="gpt-4o-mini")
+    desired_moves = lineup_optimizer(player_map, WEEK)  # takes the players and projectionsgets the list of commands to send to swapper
+    '''UNCOMMENT LINE BELOW (AND COMMETN LINE ABOCE TO SWITCH TO AI MODE'''
+    # desired_moves = chat_decides(player_map, week=WEEK, model="gpt-4o-mini") UNCOMMENT TO SWITCH TO AI MODE
     swapper_but_now_one_by_one(desired_moves, WEEK) #apply moves...which means send to the swapper, NOW found in main keeping in case it breaks
 
 
