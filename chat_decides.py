@@ -6,7 +6,13 @@ from typing import Dict, Any, List
 from openai import OpenAI
 from dotenv import load_dotenv
 from collections import defaultdict
+''''
+    Plan for today - get a reasonable swap rate...add news...bonus point start on tenserflow part of project 
+    but that'll likely be later this week
 
+
+
+'''
 if not os.getenv("GITHUB_ACTIONS"):  # local dev bla bla bla you've seen this elsewhere
     load_dotenv(override=True)
 
