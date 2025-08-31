@@ -5,8 +5,14 @@ import json
 from typing import Dict, Any, List
 from openai import OpenAI
 from dotenv import load_dotenv
+from collections import defaultdict
+''''
+    Plan for today - get a reasonable swap rate...add news...bonus point start on tenserflow part of project 
+    but that'll likely be later this week
 
 
+
+'''
 if not os.getenv("GITHUB_ACTIONS"):  # local dev bla bla bla you've seen this elsewhere
     load_dotenv(override=True)
 
@@ -64,6 +70,25 @@ SYSTEM_PROMPT = (
     "- Output ONLY JSON that matches the provided schema: {\"moves\": [...]}. "
     "No commentary."
 )
+
+'''
+Prompt below was made when I asked GPT to tweak the prompt cause random changes were being made...this was
+too strict tho...nothign was beign swapped. This needs work, but tbh, I'm proud of it. We'll work on tenserflow next
+'''
+# SYSTEM_PROMPT = (
+#     "You are a fantasy football lineup assistant. "
+#     "Given a TEAM dict of players with current slots and eligible slots, "
+#     "propose an ordered list of ESPN LINEUP moves to improve the starting lineup.\n"
+#     "- You may use your general football knowledge and judgement about players; projections optional.\n"
+#     "- Only make legal moves (toLineupSlotId ∈ eligible_slots; BENCH=20 always allowed).\n"
+#     "- Prefer bench→starter promotions. Never bench a starter unless you also promote a bench player "
+#     "into that exact slot in the same answer.\n"
+#     "- Prefer filling any empty starter slots first.\n"
+#     "- IMPORTANT: If you think the lineup is already optimal, STILL propose at least one legal improvement "
+#     "(e.g., promote your favorite bench player into FLEX or replace the weakest starter in a position).\n"
+#     "- Output ONLY JSON that matches the schema: {\"moves\": [...]}. No commentary."
+# )
+
 # again let GPT write up this stuff
 USER_PROMPT_TEMPLATE = """WEEK: {week}
 
@@ -104,7 +129,7 @@ def call_chat_gpt(team_json, week, model):
     user_msg = USER_PROMPT_TEMPLATE.format(week=week, team_json=team_json)
     resp = client.chat.completions.create(
     model=model, # rn we giving it 4.0
-    temperature=0.1, #IDK...do i want this being wild...lets play witht hsi
+    temperature=0.8, #IDK...do i want this being wild...lets play witht hsi
     response_format={"type": "json_schema", "json_schema": MOVE_SCHEMA},
     messages=[
     {"role": "system", "content": SYSTEM_PROMPT},
@@ -152,6 +177,8 @@ def validate_and_fix_moves(moves, team):
 
         cleaned.append({"playerId": pid, "fromLineupSlotId": fr, "toLineupSlotId": to})
     return cleaned
+
+
 
 def chat_decides(team, week, model:str = "gpt-4o-mini" ):
     '''
