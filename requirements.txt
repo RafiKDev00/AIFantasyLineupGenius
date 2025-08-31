@@ -4,4 +4,3 @@ pandas
 requests 
 tenacity
 nfl_data_py
-tenserflow
