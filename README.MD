@@ -18,7 +18,9 @@ Your friends want you in the fantasy league, but you don't know anything about f
 | `.env`                | Stores your secret tokens and league info (also ignored) |
 | `requirements.txt`    | Python dependencies (so far just `espn-api`) |
 | `.gitignore`          | Prevents secrets and system files from being tracked |
-| `strategyForFullLineupOptimizer.txt`| A little more in depth then the readme about the codes algorithm
+| `strategyForFullLineupOptimizer.txt`| A little more in depth then the readme about the codes algorithm|
+| `chat_decides_and_ranks.py`| We hit the OpenAI api, and let it rank our players - i.e. who will play this Sunday|
+| `chat_decides_and_moves.py`| Here we take chatGPT's ranks and use them to generate posts for the swapper to send|
 | `README.md`           | Meta. You're reading it :) |
 | `Dockerfile`          | Why do I have a dockerfile, mostly to prove I can, but also could be useful for hosting on a real server (not just github) one day |
 
