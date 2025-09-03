@@ -3,3 +3,4 @@ python-dotenv
 pandas 
 requests 
 tenacity
+openai>=1.51.0
