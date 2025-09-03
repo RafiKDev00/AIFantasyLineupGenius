@@ -8,6 +8,10 @@ from lineup_genius import lineup_optimizer
 from espn_client import get_league
 from build_player_data_structure import build_player_map_with_projections
 from swapper import swapper_but_now_one_by_one
+# from chat_decides import chat_decides
+from chat_decides_and_ranks import chat_ranks_players
+from chat_decides_and_moves import compute_best_lineup_from_rankings, plan_moves_sequential
+
 
 
 
@@ -17,6 +21,7 @@ from swapper import swapper_but_now_one_by_one
 # load_dotenv(override=True) # override so we reload the .env everytime
 if not os.getenv("GITHUB_ACTIONS"):  # local dev only
     load_dotenv(override=True)
+OPENAI_API_KEY = (os.getenv("OPENAI_API_KEY"))
 # Supposefly this hides my variables? Someone could just delete this...whatever GPT enjoy, I dont get you
 required = ["YEAR","LEAGUE_ID","TEAM_ID","SWID","ESPN_S2"]
 missing = [k for k in required if not os.getenv(k)]
@@ -66,7 +71,12 @@ def main():
     for pid, info in sorted(player_map.items(), key=lambda kv: (-kv[1]["proj"], kv[1]["name"])):
         print(f"{info['name']:<25} {info['position']:<4} {info['playerId']:<8} {info['slot_id']:<6} {info['slot']:<8} {info['proj']:>10.2f}")
 
-    desired_moves = lineup_optimizer(player_map, WEEK)  # takes the players and projectionsgets the list of commands to send to swapper
+    # desired_moves = lineup_optimizer(player_map, WEEK)  # takes the players and projectionsgets the list of commands to send to swapper
+    '''UNCOMMENT LINE BELOW (AND COMMETN LINE ABOCE TO SWITCH TO AI MODE'''
+    rankings = chat_ranks_players(player_map, model="gpt-4o-mini") # chat ranks players
+    desired = compute_best_lineup_from_rankings(player_map, rankings)
+    desired_moves = plan_moves_sequential(player_map, desired)
+    # desired_moves = chat_decides(player_map, week=WEEK, model="gpt-4o-mini") '''UNCOMMENT TO SWITCH TO AI MODE'''
     swapper_but_now_one_by_one(desired_moves, WEEK) #apply moves...which means send to the swapper, NOW found in main keeping in case it breaks
 
 

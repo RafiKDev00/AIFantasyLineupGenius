@@ -23,6 +23,8 @@ STARTER_SLOTS = [SLOT_ID["QB"], SLOT_ID["RB"], SLOT_ID["WR"], SLOT_ID["TE"],
 # ya starter slot ID's
 #there's a LOT of mapping going on here
 
+
+
 def compute_best_lineup(player_map):
     '''Use a greedy algorithm to create the optimal roster/fill slots, the best remaining rb/wr/ ===> FLEX'''
     by_pos = {} #list of PIDS and proj's by position...thanks GPT for a smart way to organize this btw
