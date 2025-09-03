@@ -29,6 +29,7 @@ jobs:
 
       - name: Run optimizer
         env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           YEAR:       ${{ secrets.YEAR }}
           LEAGUE_ID:  ${{ secrets.LEAGUE_ID }}
           TEAM_ID:    ${{ secrets.TEAM_ID }}
