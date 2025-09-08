@@ -1,12 +1,20 @@
 # B''SD
 # chat_decides_and_moves.py
-import os, json
+import os, re, json
 from typing import Dict, Any, List
 from dotenv import load_dotenv
 from openai import OpenAI
 
-if not os.getenv("GITHUB_ACTIONS"):  # local dev only etc
-    load_dotenv(override=True)
+api_key = os.getenv("OPENAI_API_KEY") or ""
+# strip edges and remove any internal newlines/tabs just in case
+api_key = re.sub(r"[\r\n\t]", "", api_key).strip()
+
+if not api_key or not api_key.startswith("sk-"):
+    raise RuntimeError("OPENAI_API_KEY looks malformed. Re-save the GitHub secret without quotes/newlines.")
+
+client = OpenAI(api_key=api_key)
+# if not os.getenv("GITHUB_ACTIONS"):  # local dev only etc
+#     load_dotenv(override=True)
 
 '''
 Strong Prompts below Set background (roleplay with AI), tell it 
