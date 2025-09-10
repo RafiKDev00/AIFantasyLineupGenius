@@ -76,11 +76,10 @@ to setting this up, we will improve this. I personally created a dummy email to 
 ## Still to Make
 - what if your league has different positions then mine
 - Notify if replaced/picking up players
-- Connect with ChatGPT
 - manage pick ups and drops and even trades?
 - Front end for easier use
 - Verify you need to be logged in on a device to use this...I don't think this can break through Disneys password authentication...and maybe it shouldn't
-- NOTE TO SELF: make sure week is correct when week 2 happens...
+
 
 ## Disclaimers
 
