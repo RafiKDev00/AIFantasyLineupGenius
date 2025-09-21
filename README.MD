@@ -2,7 +2,7 @@
 
 Your friends want you in the fantasy league, but you don't know anything about football? Liable to forget to set your lineup every week? Here's your solution! An AI ESPN Fantasy Football genius that automatically finds the **optimal weekly lineup** and sets it. It's fairly involved to set this up (we're working on it), so check the ***Find Your ESPN Credentials + Set Up*** section below for instructions on what you need to do. If you want to use the AI function from CHATGPT you'll need to purchase an API key. Hopefully we'll get a tenserflow based predictor up soon, and then you won't need to pay to add AI. Otherwise use the free version that basis everything off projections!*Disclaimer* This code only works if your team has the same makeup of positions as mine - but looking to fix that. *Coming soon*  Nonetheless, as of now now, this code can optimize your ESPN Fantasy Football lineup with a greedy algorithm, just like you would, or using openAI's api, and it does all this both remotely and automamously! This has already taken me way more time then it would have to just set my lineup every week, but for you, this will be faster. As I mentioned there is what to build upon, and I'm working on it, the 2025 season has yet to begin...
 
-How are we doing? So far AILineupGenius is 1-0! Stay tuned!
+How are we doing? So far AILineupGenius is 2-0! Stay tuned!
 
 ---
 
