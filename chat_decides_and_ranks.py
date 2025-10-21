@@ -66,6 +66,8 @@ PROMPT_TPL = """SLOT IDS: QB=0, RB=2, WR=4, TE=6, D/ST=16, K=17, BENCH=20, IR=21
 
 RULES:
 - Rank players by your football judgment; projections optional.
+- Search the internet based of the current week for each player in comparison to others of the same position
+- Make sure to look at the most recent information!
 - For each position (QB/RB/WR/TE/K/D/ST) list ALL players of that position, best→worst.
 - Use playerId integers only. No commentary.
 
