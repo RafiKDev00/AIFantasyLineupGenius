@@ -22,7 +22,7 @@ from chat_decides_and_moves import compute_best_lineup_from_rankings, plan_moves
 if not os.getenv("GITHUB_ACTIONS"):  # local dev only
     load_dotenv(override=True)
 OPENAI_API_KEY = (os.getenv("OPENAI_API_KEY"))
-# Supposefly this hides my variables? Someone could just delete this...whatever GPT enjoy, I dont get you
+# this hides my variables... Someone could just delete this on their own but that woudl be stupid...whatever GPT enjoy, I dont get you
 required = ["YEAR","LEAGUE_ID","TEAM_ID","SWID","ESPN_S2"]
 missing = [k for k in required if not os.getenv(k)]
 if missing:

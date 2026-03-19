@@ -2,7 +2,7 @@
 
 Your friends want you in the fantasy league, but you don't know anything about football? Liable to forget to set your lineup every week? Here's your solution! An AI ESPN Fantasy Football genius that automatically finds the **optimal weekly lineup** and sets it. It's fairly involved to set this up (we're working on fixing that), so check the "***Find Your ESPN Credentials + Set Up***" section below for instructions on what you need to do. 
 
-If you want to use the AI function from CHATGPT you'll need to purchase an API key (Hopefully we'll get a tenserflow based predictor up soon, and then you won't need to pay to add AI). But if you don't want to pay for anything, use the free version that bases everything off ESPN's own projections! 
+If you want to use the AI function from CHATGPT you'll need to purchase an API key (Hopefully we'll get a tenserflow based predictor up soon, and then you won't need to pay to add AI, but realistically I think that's dumb to try to harvest states...the hive mind of twitter which we will be tapping into, I think is a better model). Anyway if you don't want to pay for anything, use the free version that bases everything off ESPN's own projections! 
 
 *Disclaimer* This code only works if your team has the same makeup of positions as mine - we are looking to improve that for the 2026 season. 
 
@@ -10,9 +10,15 @@ As of now now, this code can optimize your ESPN Fantasy Football lineup with a g
 
 And How did we do in 2025? We came first in the regular season, finishing with 11 wins and 3 losses! We lost in the Semi Finals to end up taking 3rd place in the leauge. Dissapointing, but we Scored the second most points in the leauge as well 1750, with the first place (and most scoring) team scoring 1800, and the next most scoring (the fifth place team) at 1680. In the end a rash of injuries doomed the team, although the bot failed to pick up on them (as expected) and did not manage the lineup effectivcely afterward (this forced me to step in). We will need to improve the bots ability to understand injuries, which means adding a pre game time live internet search/ a twitter scrape.
 
-I think the biggest take away is that the team ESPN projected to get the least wins, actually did the best in the regular season. We destroyed the algorithm, beating autodrafts predictions by a massive margin. In other words, we did way better then the default for an uninvolved player, we almost won money.
+I think the biggest take away is that the team ESPN projected to get the least wins, actually did the best in the regular season. We destroyed the algorithm, beating autodrafts predictions by a massive margin. In other words, we did way better then the default for an uninvolved player, hell... we almost won money.
 
-Conclusion: It was a sucesfull trial run. Next season: live draft instead of manual querying, injury detection (so it can manage bench even when there are injured players), upgrade the model and model querying to track more live data (maybe allow a pre game twitter scrape?) - which really is just for injury purposes. Let's see....
+Conclusion: It was a sucesfull trial run. Next season: live draft instead of manual querying, ~~injury detection (so it can manage bench even when there are injured players)~~ DONE, upgrade the model and model querying to track more live data ~~(maybe allow a pre game twitter scrape?)~~ DONE — see `check_injury` below. Let's see....
+
+### What's New for 2026 !!!! 
+
+**MCP Server** — You can now talk to the bot in plain English via Claude Desktop (or any MCP-compatible client). Ask it to check your roster, optimize your lineup, check injuries, etc. No more running scripts manually.
+
+**Injury Detection** — The thing that killed us in 2025. `check_injury` pulls ESPN's official status AND searches Google News for what the insiders are actually saying (Schefter, Rapoport, beat writers — the real sources). it then figures out replacement moves from your bench, handles flex juggling, and caches the moves so you can apply them immediately. This was the numero uno thing we needed.
 
 ---
 
@@ -33,6 +39,10 @@ Conclusion: It was a sucesfull trial run. Next season: live draft instead of man
 | `strategyForFullLineupOptimizer.txt`| A little more in depth then the readme about the codes algorithm|
 | `chat_decides_and_ranks.py`| We hit the OpenAI api, and let it rank our players - i.e. who will play this Sunday|
 | `chat_decides_and_moves.py`| Here we take chatGPT's ranks and use them to generate posts for the swapper to send|
+| `mcp_server/`         | MCP server package — talk to the bot in plain English via Claude Desktop or any MCP client |
+| `mcp_server/server.py`| FastMCP instance, shared cache, and helper functions |
+| `mcp_server/tools/`   | One file per tool: `roster.py`, `optimize.py`, `ai_rank.py`, `apply_moves.py`, `check_injury.py` |
+| `run_mcp.sh`          | Convenience script to launch the MCP server |
 | `README.md`           | Meta. You're reading it :) |
 | `Dockerfile`          | Why do I have a dockerfile, mostly to prove I can, but also could be useful for hosting on a real server (not just github) one day |
 
@@ -89,8 +99,9 @@ to setting this up, we will improve this. I personally created a dummy email to 
 - what if your league has different positions then mine
 - Notify if replaced/picking up players
 - manage pick ups and drops and even trades?
-- Front end for easier use
+- ~~Front end for easier use~~ MCP server + Claude Desktop is basically this now
 - Verify you need to be logged in on a device to use this...I don't think this can break through Disneys password authentication...and maybe it shouldn't
+- Live draft assistant
 
 
 ## Disclaimers

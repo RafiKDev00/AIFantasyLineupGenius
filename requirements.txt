@@ -4,5 +4,6 @@ pandas
 requests 
 tenacity
 openai
+mcp[cli]
 
-# source venv/bin/activate 
+# source venv/bin/activate
